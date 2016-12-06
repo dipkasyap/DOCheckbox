@@ -10,15 +10,15 @@ import UIKit
 
 class ChildViewController: UIViewController {
     
-    var style: DOCheckboxStyle = .Default
+    var style: DOCheckboxStyle = .default
     let titleStr: [DOCheckboxStyle : String] = [
-        .Default            : "Default",
-        .Square             : "Square",
-        .FilledSquare       : "FilledSquare",
-        .RoundedSquare      : "RoundedSquare",
-        .FilledRoundedSquare: "FilledRoundedSquare",
-        .Circle             : "Circle",
-        .FilledCircle       : "FilledCircle"]
+        .default            : "Default",
+        .square             : "Square",
+        .filledSquare       : "FilledSquare",
+        .roundedSquare      : "RoundedSquare",
+        .filledRoundedSquare: "FilledRoundedSquare",
+        .circle             : "Circle",
+        .filledCircle       : "FilledCircle"]
     var checkboxList: [DOCheckbox] = []
     let checkboxSizeList: [CGFloat] = [10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0]
     
@@ -72,10 +72,10 @@ class ChildViewController: UIViewController {
         y += 75.0
         
         
-        scrollView.contentSize = CGSizeMake(730, y)
+        scrollView.contentSize = CGSize(width: 730, height: y)
     }
 
-    func layoutCheckbox(y: CGFloat, color: UIColor?) {
+    func layoutCheckbox(_ y: CGFloat, color: UIColor?) {
         
         let size: CGFloat = 50.0
         var x: CGFloat = 25.0
@@ -83,7 +83,7 @@ class ChildViewController: UIViewController {
         for i in 0 ..< checkboxSizeList.count {
             let checkBoxPosition = (size - checkboxSizeList[i]) / 2
             
-            let checkbox = DOCheckbox(frame: CGRectMake(x, y, size, size), checkboxFrame: CGRectMake(checkBoxPosition, checkBoxPosition, checkboxSizeList[i], checkboxSizeList[i]))
+            let checkbox = DOCheckbox(frame: CGRect(x: x, y: y, width: size, height: size), checkboxFrame: CGRect(x: checkBoxPosition, y: checkBoxPosition, width: checkboxSizeList[i], height: checkboxSizeList[i]))
             checkbox.setPresetStyle(style, baseColor: color)
             scrollView.addSubview(checkbox)
             checkboxList.append(checkbox)
@@ -92,22 +92,22 @@ class ChildViewController: UIViewController {
         }
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         //
         for checkbox in checkboxList {
-            checkbox.selected = true
+            checkbox.isSelected = true
         }
     }
-    @IBAction func toggle(sender: UIBarButtonItem) {
+    @IBAction func toggle(_ sender: UIBarButtonItem) {
         if sender.title == "Check All"  {
             sender.title = "Uncheck All"
             for checkbox in checkboxList {
-                checkbox.selected = true
+                checkbox.isSelected = true
             }
         } else {
             sender.title = "Check All"
             for checkbox in checkboxList {
-                checkbox.selected = false
+                checkbox.isSelected = false
             }
         }
     }

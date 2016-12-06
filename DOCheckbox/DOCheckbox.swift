@@ -10,21 +10,45 @@
 //
 
 import UIKit
+// FIXME: comparison with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+    switch (lhs, rhs) {
+    case let (l?, r?):
+        return l < r
+    case (nil, _?):
+        return true
+    default:
+        return false
+    }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+    switch (lhs, rhs) {
+    case let (l?, r?):
+        return l > r
+    default:
+        return rhs < lhs
+    }
+}
+
 
 enum DOCheckboxStyle : Int {
-    case Default
-    case Square
-    case FilledSquare
-    case RoundedSquare
-    case FilledRoundedSquare
-    case Circle
-    case FilledCircle
+    case `default`
+    case square
+    case filledSquare
+    case roundedSquare
+    case filledRoundedSquare
+    case circle
+    case filledCircle
 }
 
 class DOCheckbox: UIButton {
     
-    private var style: DOCheckboxStyle! = .Default
-    private var baseColor: UIColor = UIColor.blackColor()
+    fileprivate var style: DOCheckboxStyle! = .default
+    fileprivate var baseColor: UIColor = UIColor.black
     
     var checkboxFrame: CGRect! {
         didSet {
@@ -34,7 +58,7 @@ class DOCheckbox: UIButton {
             ratio = (ratioW > ratioH) ? ratioH : ratioW
             let checkboxSize: CGFloat = (ratioW > ratioH) ? checkboxFrame.height : checkboxFrame.width
             
-            checkboxFrame = CGRectMake(checkboxFrame.origin.x, checkboxFrame.origin.y, checkboxSize, checkboxSize)
+            checkboxFrame = CGRect(x: checkboxFrame.origin.x, y: checkboxFrame.origin.y, width: checkboxSize, height: checkboxSize)
             checkboxLayer.frame = checkboxFrame
             
             checkLayer.frame = checkboxFrame
@@ -48,14 +72,14 @@ class DOCheckbox: UIButton {
         didSet {
             checkboxLayer.borderWidth = checkboxBorderWidth
             let rectCornerRadius = (checkboxCornerRadius > checkboxBorderWidth / 2) ? checkboxCornerRadius - checkboxBorderWidth / 2 : 0
-            checkboxLayer.path = CGPathCreateWithRoundedRect(CGRectMake(checkboxBorderWidth / 2, checkboxBorderWidth / 2, checkboxFrame.width - checkboxBorderWidth, checkboxFrame.height - checkboxBorderWidth), rectCornerRadius, rectCornerRadius, nil)
+            checkboxLayer.path = CGPath(roundedRect: CGRect(x: checkboxBorderWidth / 2, y: checkboxBorderWidth / 2, width: checkboxFrame.width - checkboxBorderWidth, height: checkboxFrame.height - checkboxBorderWidth), cornerWidth: rectCornerRadius, cornerHeight: rectCornerRadius, transform: nil)
         }
     }
     var checkboxCornerRadius: CGFloat! = 0.0 {
         didSet {
             checkboxLayer.cornerRadius = checkboxCornerRadius
             let rectCornerRadius = (checkboxCornerRadius > checkboxBorderWidth / 2) ? checkboxCornerRadius - checkboxBorderWidth / 2 : 0
-            checkboxLayer.path = CGPathCreateWithRoundedRect(CGRectMake(checkboxBorderWidth / 2, checkboxBorderWidth / 2, checkboxFrame.width - checkboxBorderWidth, checkboxFrame.height - checkboxBorderWidth), rectCornerRadius, rectCornerRadius, nil)
+            checkboxLayer.path = CGPath(roundedRect: CGRect(x: checkboxBorderWidth / 2, y: checkboxBorderWidth / 2, width: checkboxFrame.width - checkboxBorderWidth, height: checkboxFrame.height - checkboxBorderWidth), cornerWidth: rectCornerRadius, cornerHeight: rectCornerRadius, transform: nil)
         }
     }
     var checkWidth: CGFloat! {
@@ -67,29 +91,29 @@ class DOCheckbox: UIButton {
         }
     }
     var checkboxBgColor: UIColor! {
-        didSet { checkboxLayer.fillColor = checkboxBgColor.CGColor }
+        didSet { checkboxLayer.fillColor = checkboxBgColor.cgColor }
     }
     var checkboxBorderColor: UIColor! {
-        didSet { checkboxLayer.borderColor = checkboxBorderColor.CGColor }
+        didSet { checkboxLayer.borderColor = checkboxBorderColor.cgColor }
     }
     var checkColor: UIColor! {
-        didSet { checkLayer.strokeColor = checkColor.CGColor }
+        didSet { checkLayer.strokeColor = checkColor.cgColor }
     }
     var checkBgColor: UIColor! {
-        didSet { checkBgLayer.strokeColor = checkBgColor.CGColor }
+        didSet { checkBgLayer.strokeColor = checkBgColor.cgColor }
     }
     
-    private(set) var ratio: CGFloat = 1.0
+    fileprivate(set) var ratio: CGFloat = 1.0
     let checkboxLayer: CAShapeLayer! = CAShapeLayer()
     let checkLayer: CAShapeLayer! = CAShapeLayer()
     let checkBgLayer: CAShapeLayer! = CAShapeLayer()
     
-    override var selected: Bool {
+    override var isSelected: Bool {
         didSet {
-            if (selected != oldValue) {
+            if (isSelected != oldValue) {
                 let strokeStart = CABasicAnimation(keyPath: "strokeStart")
                 let strokeEnd = CABasicAnimation(keyPath: "strokeEnd")
-                if self.selected {
+                if self.isSelected {
                     // check animation
                     strokeStart.fromValue = 0.0
                     strokeStart.toValue = 0.0
@@ -114,12 +138,12 @@ class DOCheckbox: UIButton {
     }
     
     required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        super.init(coder: aDecoder)!
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        layout(frame, checkboxFrame: CGRectMake(0, 0, frame.width, frame.height))
+        layout(frame, checkboxFrame: CGRect(x: 0, y: 0, width: frame.width, height: frame.height))
     }
     
     init(frame: CGRect, checkboxFrame: CGRect) {
@@ -127,7 +151,7 @@ class DOCheckbox: UIButton {
         layout(frame, checkboxFrame: checkboxFrame)
     }
     
-    func layout(frame: CGRect, checkboxFrame: CGRect) {
+    func layout(_ frame: CGRect, checkboxFrame: CGRect) {
         
         // checkbox
         self.checkboxFrame = checkboxFrame
@@ -150,14 +174,14 @@ class DOCheckbox: UIButton {
         self.layer.addSublayer(checkLayer)
         
         // add target for TouchUpInside event
-        self.addTarget(self, action: "toggleSelected:", forControlEvents:.TouchUpInside)
+        self.addTarget(self, action: #selector(DOCheckbox.toggleSelected(_:)), for:.touchUpInside)
     }
     
-    func toggleSelected(sender: AnyObject) {
-        self.selected = !self.selected
+    func toggleSelected(_ sender: AnyObject) {
+        self.isSelected = !self.isSelected
     }
     
-    func setPresetStyle(style: DOCheckboxStyle?, baseColor: UIColor?) {
+    func setPresetStyle(_ style: DOCheckboxStyle?, baseColor: UIColor?) {
         if (style != nil) {
             self.style = style!
         }
@@ -167,64 +191,69 @@ class DOCheckbox: UIButton {
         
         // checkbox style
         switch (self.style!) {
-        case .Default:
+        case .default:
             checkboxBorderWidth = 0
             checkboxCornerRadius = 0
             
-        case .Square, .FilledSquare:
+        case .square, .filledSquare:
             checkboxBorderWidth = round(5 * ratio * 10) / 10
             checkboxCornerRadius = 0
             
-        case .RoundedSquare, .FilledRoundedSquare:
+        case .roundedSquare, .filledRoundedSquare:
             checkboxBorderWidth = round(5 * ratio * 10) / 10
             checkboxCornerRadius = round(15 * ratio * 10) / 10
             
-        case .Circle, .FilledCircle:
+        case .circle, .filledCircle:
             checkboxBorderWidth = round(5 * ratio * 10) / 10
             checkboxCornerRadius = round(50 * ratio * 10) / 10
         }
         
         // check style
         switch (self.style!) {
-        case .Default, .Square, .FilledSquare, .RoundedSquare, .FilledRoundedSquare, .Circle, .FilledCircle:
+        case .default, .square, .filledSquare, .roundedSquare, .filledRoundedSquare, .circle, .filledCircle:
             checkWidth = round(15 * ratio * 10) / 10
             checkBgLayer.path = {
-                let path = CGPathCreateMutable()
-                CGPathMoveToPoint(path, nil, 27 * self.ratio, 53 * self.ratio)
-                CGPathAddLineToPoint(path, nil, 42 * self.ratio, 68 * self.ratio)
-                CGPathAddLineToPoint(path, nil, 75 * self.ratio, 34 * self.ratio)
+                let path = CGMutablePath()
+                
+                path.move(to: CGPoint(x: 27 * self.ratio, y: 53 * self.ratio))
+                path.addLine(to: CGPoint(x: 42 * self.ratio, y: 68 * self.ratio))
+                path.addLine(to: CGPoint(x: 75 * self.ratio, y: 34 * self.ratio))
+                
+                
                 return path
-                }()
+            }()
             checkBgLayer.lineCap = kCALineCapSquare
             checkBgLayer.lineJoin = kCALineJoinMiter
             checkLayer.path = {
-                let path = CGPathCreateMutable()
-                CGPathMoveToPoint(path, nil, 27 * self.ratio, 53 * self.ratio)
-                CGPathAddLineToPoint(path, nil, 42 * self.ratio, 68 * self.ratio)
-                CGPathAddLineToPoint(path, nil, 75 * self.ratio, 34 * self.ratio)
+                let path = CGMutablePath()
+                
+                path.move(to: CGPoint(x: 27 * self.ratio, y: 53 * self.ratio))
+                path.addLine(to: CGPoint(x: 42 * self.ratio, y: 68 * self.ratio))
+                path.addLine(to: CGPoint(x: 75 * self.ratio, y: 34 * self.ratio))
+                
                 return path
-                }()
+            }()
             checkLayer.lineCap = kCALineCapSquare
             checkLayer.lineJoin = kCALineJoinMiter
         }
         
         // color
         switch (self.style!) {
-        case .Default, .Square, .RoundedSquare, .Circle:
-            checkboxBgColor = UIColor.whiteColor()
+        case .default, .square, .roundedSquare, .circle:
+            checkboxBgColor = UIColor.white
             checkboxBorderColor = self.baseColor
             checkColor = self.baseColor
-            checkBgColor = convertColor(self.baseColor, toColor: UIColor.whiteColor(), percent: 0.85)
+            checkBgColor = convertColor(self.baseColor, toColor: UIColor.white, percent: 0.85)
             
-        case .FilledSquare, .FilledRoundedSquare, .FilledCircle:
+        case .filledSquare, .filledRoundedSquare, .filledCircle:
             checkboxBgColor = self.baseColor
             checkboxBorderColor = self.baseColor
-            checkColor = UIColor.whiteColor()
-            checkBgColor = convertColor(self.baseColor, toColor: UIColor.whiteColor(), percent: 0.3)
+            checkColor = UIColor.white
+            checkBgColor = convertColor(self.baseColor, toColor: UIColor.white, percent: 0.3)
         }
     }
     
-    func convertColor(fromColor: UIColor, toColor: UIColor, percent: CGFloat) -> UIColor {
+    func convertColor(_ fromColor: UIColor, toColor: UIColor, percent: CGFloat) -> UIColor {
         var r1: CGFloat = 0.0
         var g1: CGFloat = 0.0
         var b1: CGFloat = 0.0
@@ -247,14 +276,14 @@ class DOCheckbox: UIButton {
 }
 
 extension CALayer {
-    func ocb_applyAnimation(animation: CABasicAnimation) {
+    func ocb_applyAnimation(_ animation: CABasicAnimation) {
         let copy = animation.copy() as! CABasicAnimation
         
         if copy.fromValue == nil {
-            copy.fromValue = self.presentationLayer().valueForKeyPath(copy.keyPath)
+            copy.fromValue = self.presentation()?.value(forKeyPath: copy.keyPath!)
         }
         
-        self.addAnimation(copy, forKey: copy.keyPath)
-        self.setValue(copy.toValue, forKeyPath:copy.keyPath)
+        self.add(copy, forKey: copy.keyPath)
+        self.setValue(copy.toValue, forKeyPath:copy.keyPath!)
     }
 }

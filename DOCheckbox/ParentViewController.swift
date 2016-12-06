@@ -10,9 +10,9 @@ import UIKit
 
 class ParentViewController: UITableViewController, UITextFieldDelegate  {
     
-    var style: DOCheckboxStyle = .Default
+    var style: DOCheckboxStyle = .default
     
-    var actionMap: [[(selectedIndexPath: NSIndexPath) -> Void]] {
+    var actionMap: [[(_ selectedIndexPath: IndexPath) -> Void]] {
         return [
             // Alert style alerts.
             [
@@ -31,56 +31,56 @@ class ParentViewController: UITableViewController, UITextFieldDelegate  {
         ]
     }
     
-    func showDefault(_: NSIndexPath) {
-        self.style = .Default
-        self.performSegueWithIdentifier("showChildView", sender:self)
+    func showDefault(_: IndexPath) {
+        self.style = .default
+        self.performSegue(withIdentifier: "showChildView", sender:self)
     }
     
-    func showSquare(_: NSIndexPath) {
-        self.style = .Square
-        self.performSegueWithIdentifier("showChildView", sender:self)
+    func showSquare(_: IndexPath) {
+        self.style = .square
+        self.performSegue(withIdentifier: "showChildView", sender:self)
     }
     
-    func showSquareFill(_: NSIndexPath) {
-        self.style = .FilledSquare
-        self.performSegueWithIdentifier("showChildView", sender:self)
+    func showSquareFill(_: IndexPath) {
+        self.style = .filledSquare
+        self.performSegue(withIdentifier: "showChildView", sender:self)
     }
     
-    func showRoundedSquare(_: NSIndexPath) {
-        self.style = .RoundedSquare
-        self.performSegueWithIdentifier("showChildView", sender:self)
+    func showRoundedSquare(_: IndexPath) {
+        self.style = .roundedSquare
+        self.performSegue(withIdentifier: "showChildView", sender:self)
     }
     
-    func showRoundedSquareFill(_: NSIndexPath) {
-        self.style = .FilledRoundedSquare
-        self.performSegueWithIdentifier("showChildView", sender:self)
+    func showRoundedSquareFill(_: IndexPath) {
+        self.style = .filledRoundedSquare
+        self.performSegue(withIdentifier: "showChildView", sender:self)
     }
     
-    func showCircle(_: NSIndexPath) {
-        self.style = .Circle
-        self.performSegueWithIdentifier("showChildView", sender:self)
+    func showCircle(_: IndexPath) {
+        self.style = .circle
+        self.performSegue(withIdentifier: "showChildView", sender:self)
     }
     
-    func showCircleFill(_: NSIndexPath) {
-        self.style = .FilledCircle
-        self.performSegueWithIdentifier("showChildView", sender:self)
+    func showCircleFill(_: IndexPath) {
+        self.style = .filledCircle
+        self.performSegue(withIdentifier: "showChildView", sender:self)
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any!) {
         if (segue.identifier == "showChildView") {
-            let childViewController = segue.destinationViewController as! ChildViewController
+            let childViewController = segue.destination as! ChildViewController
             childViewController.style = self.style
-            self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.Plain, target: nil, action: nil)
+            self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: nil, action: nil)
         }
     }
     // MARK: UITableViewDelegate
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let action = actionMap[indexPath.section][indexPath.row]
         
-        action(selectedIndexPath: indexPath)
+        action(indexPath)
         
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }
